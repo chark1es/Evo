@@ -18,6 +18,10 @@ This bot is meant to be a completely "free" bot, which means that all features t
 
 Evo is short for evolution, as this will be an discord bot that will implement many things as time goes on
 
+### Why is it free?
+
+I don't really like the fact that even the most simplest of features are paid. That's why I want Evo to be free.
+
 ### Can I invite the bot to my server?
 
 No, there's barely any code for you to even do anything functional with the bot yet
@@ -25,6 +29,8 @@ No, there's barely any code for you to even do anything functional with the bot 
 ### Is there an ETA as to when this will be finished?
 
 No, there is no ETA as of right now.
+
+
 
 ---
 <div align="center">
