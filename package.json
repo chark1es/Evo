@@ -9,7 +9,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node .",
-    "dev": "nodemon --config nodemon.json src/index.ts"
+    "dev": "nodemon --config nodemon.json src/index.ts",
+    "regcommands": "ts-node src/register-commands.ts"
   },
   "keywords": [],
   "author": "",
