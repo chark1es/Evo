@@ -7,16 +7,16 @@
 </div>
 
 ---
+
 # About this bot
 
-This bot is meant to be a completely "free" bot, which means that all features that might be paid on other discord bots will be free here.
-
+This bot is meant to be a completely "free" bot, which means that all features that might be paid on other nextcord bots will be free here.
 
 # FAQ
 
 ### Why is the bot named Evo?
 
-Evo is short for evolution, as this will be an discord bot that will implement many things as time goes on
+Evo is short for evolution, as this will be an nextcord bot that will implement many things as time goes on
 
 ### Why is it free?
 
@@ -30,11 +30,8 @@ No, there's barely any code for you to even do anything functional with the bot 
 
 No, there is no ETA as of right now.
 
-
-
 ---
+
 <div align="center">
 <img alt="Stats" src="https://repobeats.axiom.co/api/embed/6eaf511255215d7b45c8ce1bd1a60b3beedc8ae0.svg">
 </div>
-
-
