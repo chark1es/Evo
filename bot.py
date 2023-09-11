@@ -71,6 +71,8 @@ async def on_ready():
 
 @bot.command()
 async def sync(ctx):
+    if not ctx.author.id in data["authors"]:
+        return None
     for guild_id in data["guilds"]:
         await bot.sync_application_commands(guild_id=guild_id)
 
