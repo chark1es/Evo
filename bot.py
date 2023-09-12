@@ -1,4 +1,5 @@
 import nextcord
+from nextcord import Interaction, ApplicationCheckFailure
 import os
 import json
 from nextcord.ext import commands
@@ -12,7 +13,7 @@ botToken = dotenv_values(".env").get("TOKEN")
 intents = nextcord.Intents.all()
 intents.members = True
 intents.presences = True
-
+intents.voice_states = True
 bot = commands.Bot(command_prefix="/", intents=intents,
                    application_id="1108673506780135475")
 bot.remove_command("help")
@@ -73,8 +74,12 @@ async def on_ready():
 async def sync(ctx):
     if not ctx.author.id in data["authors"]:
         return None
-    for guild_id in data["guilds"]:
-        await bot.sync_application_commands(guild_id=guild_id)
+    try:
+        for guild_id in data["guilds"]:
+            await bot.sync_application_commands(guild_id=guild_id)
+        await ctx.send("Successfully synced", reference=ctx.message)
+    except Exception as e:
+        await ctx.send(f"ERROR: {e}", reference=ctx.message)
 
 
 @bot.event
