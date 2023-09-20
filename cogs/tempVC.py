@@ -35,15 +35,20 @@ class tempVC(commands.Cog):
                 await member.move_to(voiceChannel)
                 s.addChannels(member.guild.id, channel_id=voiceChannel.id,
                               vctype='monitor_voice_channel')
-            elif before.channel.id in monitorChannels:
-                if len(before.channel.members) == 0:
-                    await before.channel.delete()
-                    s.removeChannels(member.guild.id, channel_id=before.channel.id,
-                                     vctype='monitor_voice_channel')
+
         except AttributeError as a:
             pass
         except Exception as e:
-            print(e)
+            s.throwError(self.__class__.__name__, e, "Creating a new temp VC")
+        try:
+            for channel in member.guild.voice_channels:
+                if channel.id in monitorChannels:
+                    if len(channel.members) == 0:
+                        await channel.delete()
+                        s.removeChannels(member.guild.id, channel_id=channel.id,
+                                         vctype='monitor_voice_channel')
+        except Exception as e:
+            s.throwError(self.__class__.__name__, e, "Deleting voice channels")
 
     # Main slash command, cannot be used
 
@@ -55,6 +60,10 @@ class tempVC(commands.Cog):
     @vc.subcommand(description="invite user to voice channel")
     async def invite(self, interaction: Interaction, user: nextcord.Member = SlashOption(name="user", description="user to invite"),):
 
+        if interaction.user.voice.channel == None:
+            await interaction.response.send_message(f"You are not in a voice channel", ephemeral=True)
+            return
+
         currentVC = interaction.user.voice.channel
         overwrite = nextcord.PermissionOverwrite()
         overwrite.view_channel = True
@@ -65,6 +74,10 @@ class tempVC(commands.Cog):
     # Creates a voice channel that sends the user to their own temporary voice channel
     @vc.subcommand(description="creates a voice channel that will create temporary voice channels when a user joins")
     async def create_vc(self, interaction: Interaction, category: nextcord.CategoryChannel = SlashOption(name="category", description="category, if any, to create a VC under.", required=False)):
+
+        if nextcord.Permissions.manage_channels in interaction.user.guild_permissions:
+            await interaction.response.send_message(f"You do not have permission to use this command", ephemeral=True)
+            return
 
         guildID = interaction.user.guild.id
 

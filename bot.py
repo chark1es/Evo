@@ -82,10 +82,10 @@ async def sync(ctx):
         await ctx.send(f"ERROR: {e}", reference=ctx.message)
 
 
-@bot.event
-async def on_message(message):
-    await bot.process_commands(message)
-    print(f'Message from {message.author}: {message.content}')
+# @bot.event
+# async def on_message(message):
+#     await bot.process_commands(message)
+#     print(f'Message from {message.author}: {message.content}')
 
 # Load all cogs at startup
 

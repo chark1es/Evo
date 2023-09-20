@@ -3,12 +3,17 @@ import json
 from pocketbase import PocketBase  # Client also works the same
 from pocketbase.client import FileUpload
 from dotenv import dotenv_values
+import traceback
 
 
 class shortcuts():
 
     def __init__(self, client):
         self.client = client
+
+    def throwError(cog, e, specific="Nothing Specific"):
+        print(
+            f"ERROR in {cog} \n\n{type(e).__name__}  \n\nException: {e} \n\nTraceback: {traceback.format_exc()}")
 
     def getChannels(guild_id, vctype="voice_channel"):
         guild_id = str(guild_id)
