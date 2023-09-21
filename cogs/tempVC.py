@@ -67,6 +67,7 @@ class tempVC(commands.Cog):
         currentVC = interaction.user.voice.channel
         overwrite = nextcord.PermissionOverwrite()
         overwrite.view_channel = True
+        overwrite.manage_channels = True
         await currentVC.set_permissions(user, overwrite=overwrite)
 
         await interaction.response.send_message(f"{user.display_name} has been invite to the channel", ephemeral=True)
