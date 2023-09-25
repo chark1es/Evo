@@ -1,3 +1,7 @@
 nextcord[voice]
-dotenv
+python-dotenv
 pocketbase
+flask
+asyncio
+requests
+aiohttp

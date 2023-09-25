@@ -47,6 +47,7 @@ class tempVC(commands.Cog):
                         await channel.delete()
                         s.removeChannels(member.guild.id, channel_id=channel.id,
                                          vctype='monitor_voice_channel')
+
         except Exception as e:
             s.throwError(self.__class__.__name__, e, "Deleting voice channels")
 

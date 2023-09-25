@@ -13,7 +13,7 @@ class shortcuts():
 
     def throwError(cog, e, specific="Nothing Specific"):
         print(
-            f"ERROR in {cog} \n\n{type(e).__name__}  \n\nException: {e} \n\nTraceback: {traceback.format_exc()}")
+            f"ERROR in {cog} \n\n[{type(e)}]: {type(e).__name__}  \n\nException: {e} \n\nTraceback: {traceback.format_exc()}")
 
     def getChannels(guild_id, vctype="voice_channel"):
         guild_id = str(guild_id)
