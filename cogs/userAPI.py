@@ -6,6 +6,7 @@ from pocketbase import PocketBase
 from dotenv import dotenv_values
 import json
 from nextcord import Interaction, SlashOption
+from functions import shortcuts as s
 
 import string
 import random
@@ -28,10 +29,8 @@ async def index(request):
     if userID == None:
         return web.json_response({'status': 'error', 'message': 'Missing User ID'}, status=400)
 
-    trueRecord = None
-
     def check_auth(apiKey=apiKey, userID=userID):
-        global trueRecord
+
         email = dotenv_values(".env").get("DB_EMAIL")
         password = dotenv_values(".env").get("DB_PASSWORD")
         client = PocketBase(dotenv_values(".env").get("DB_URL"))
@@ -50,7 +49,7 @@ async def index(request):
                 hasApiKey = True
             if (apiKey in record.__dict__["api_key"] and userID in record.__dict__["user_id"]):
                 authenicated = True
-                trueRecord = record
+                break
 
         if not authenicated:
             if (hasApiKey):
@@ -58,32 +57,95 @@ async def index(request):
             else:
                 return {"status": "error", "message": "Invalid API key"}
 
-        return {"status": "success"}
+        return {"status": "success"}, record
 
-    auth = check_auth(apiKey, userID)
+    auth, record = check_auth(apiKey, userID)
     if auth["status"] == "error":
         return web.json_response(auth, status=400)
 
-    kv = trueRecord.__dict__["kv"]
+    kv = record.__dict__["kv"]
 
-    user = await request.app['bot'].fetch_user(userID)
-    accentColor = user.accent_color
-    avatar = user.avatar.url
-    banner = user.banner.url
-    bot = user.bot
-    color = user.color.value
-    created_at = user.created_at.isoformat()
-    default_avatar = user.default_avatar.url
-    discriminator = user.discriminator
-    name = user.name
-    nickname = user.display_name
-    user_id = user.id
+    try:
+        user = request.app['bot'].get_user(int(userID))
+        guildID = user.mutual_guilds[0].id
+
+        mutualGuild = request.app['bot'].get_guild(guildID)
+
+    except Exception as e:
+        s.throwError("userAPI", e, "Getting user and guild object")
+        return web.json_response({"status": "error", "message": "User does not share any mutual guilds with the bot"}, status=400)
+    member = mutualGuild.get_member(
+        int(userID))
+    print(member)
+    accentColor = member.accent_color
+    avatar = member.avatar.url
+    # banner = member.banner.url
+    bot = member.bot
+    color = member.color.value
+    created_at = member.created_at.isoformat()
+    default_avatar = member.default_avatar.url
+    discriminator = member.discriminator
+    name = member.name
+    nickname = member.display_name
+    user_id = member.id
+
+    mobileStatus = member.mobile_status
+    desktopStatus = member.desktop_status
+    webStatus = member.web_status
+    status = member.status
+    rawStatus = member.raw_status
+
+    def safe_getattr(obj, attr_name, default=None):
+        """Safely retrieve an attribute from an object."""
+        return getattr(obj, attr_name, default)
+
+    def handle_generic_activity(activity):
+        attributes = [
+            'name', 'type', 'url', 'created_at', 'timestamps',
+            'application_id', 'details', 'state', 'emoji',
+            'party', 'assets', 'buttons', 'secrets', 'instance',
+            'flags', 'large_image_url', 'large_image_text',
+            'small_image_url', 'small_image_text', 'start', 'end'
+        ]
+        return {attr: str(safe_getattr(activity, attr)) for attr in attributes}
+
+    def handle_spotify_activity(activity):
+        attributes = ['track_id', 'artist', 'album', 'track', 'duration']
+        return {attr: str(safe_getattr(activity, attr)) for attr in attributes}
+
+    def handle_game_activity(activity):
+        attributes = ['name', 'type', 'url', 'details', 'state', 'large_image_url',  'large_image_text',
+                      'small_image_url', 'small_image_text']
+        return {attr: str(safe_getattr(activity, attr)) for attr in attributes}
+
+    def handle_streaming_activity(activity):
+        attributes = ['name', 'type', 'url', 'details', 'state', "large_image_url", 'large_image_text',
+                      'small_image_url', 'small_image_text']
+        return {attr: str(safe_getattr(activity, attr)) for attr in attributes}
+
+    def handle_custom_activity(activity):
+        attributes = ['name', 'type', 'created_at', 'emoji', 'state']
+        return {attr: str(safe_getattr(activity, attr)) for attr in attributes}
+
+    activity_handlers = {
+        nextcord.activity.Activity: handle_generic_activity,
+        nextcord.activity.Spotify: handle_spotify_activity,
+        nextcord.activity.Game: handle_game_activity,
+        nextcord.activity.Streaming: handle_streaming_activity,
+        nextcord.activity.CustomActivity: handle_custom_activity
+    }
+
+    activity_type = type(member.activity)
+    if activity_type in activity_handlers:
+        userActivity = activity_handlers[activity_type](member.activity)
+    else:
+        userActivity = {}
 
     responseJson = {
         "status": "success",
         "accentColor": accentColor,
         "avatar": avatar,
-        "banner": banner,
+        # "banner": banner,
         "bot": bot,
         "color": color,
         "created_at": created_at,
@@ -92,7 +154,15 @@ async def index(request):
         "name": name,
         "nickname": nickname,
         "user_id": user_id,
-        "kv": kv
+        "kv": kv,
+        "mobileStatus": mobileStatus,
+        "desktopStatus": desktopStatus,
+        "webStatus": webStatus,
+        "status": status,
+        "rawStatus": rawStatus,
+        "primaryActivity": userActivity,
+        # "listActivities": lst
+
     }
     return web.json_response(responseJson)
 

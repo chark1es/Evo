@@ -6,6 +6,7 @@ from nextcord.ext import commands
 from nextcord.ext.commands import Greedy, Context
 from dotenv import dotenv_values
 from typing import Literal, Optional
+from functions import shortcuts as s
 
 # Load
 botToken = dotenv_values(".env").get("TOKEN")
@@ -76,10 +77,14 @@ async def sync(ctx):
         return None
     try:
         for guild_id in data["guilds"]:
-            await bot.sync_application_commands(guild_id=guild_id)
+            try:
+                await bot.sync_application_commands(guild_id=guild_id)
+            except Exception as e:
+                print(f"Failed to sync {guild_id}: {e}")
         await ctx.send("Successfully synced", reference=ctx.message)
     except Exception as e:
         await ctx.send(f"ERROR: {e}", reference=ctx.message)
+        s.throwError("sync", e)
 
 
 # @bot.event
