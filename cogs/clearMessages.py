@@ -33,14 +33,19 @@ class clearMessages(commands.Cog):
                 elif type == "all":
                     await interaction.channel.purge(limit=limit, bulk=True)
                 else:
-                    await interaction.response.send_message("Invalid type", ephemeral=True)
+                    await interaction.followup.send("Invalid type", ephemeral=True)
                     return
-                await interaction.response.send_message(f"Deleted {limit} messages", ephemeral=True)
+                await interaction.followup.send(f"Deleted {limit} messages", ephemeral=True)
             else:
                 await interaction.response.send_message("You don't have the permission to do that", ephemeral=True)
 
         except Exception as e:
             s.throwError(self.__class__.__name__, e, "clear_messages")
+
+            if interaction.response.is_done():
+                await interaction.followup.send("Something went wrong. Please DM the developer of the discord bot", ephemeral=True)
+            else:
+                await interaction.response.send_message("Something went wrong. Please DM the developer of the discord bot", ephemeral=True)
 
 
 def setup(bot):
